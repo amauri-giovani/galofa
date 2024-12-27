@@ -1,16 +1,25 @@
+import os
 from itertools import combinations
-from random import choices, choice
 import pandas as pd
+from results_download import results_download
 
 
 class Galofa:
-    def __init__(self, file_path):
+    def __init__(self):
         self.todas_combinacoes_possiveis = combinations(range(1, 26), 15)
-        self.file_reader = pd.read_excel(file_path)
+        self.file_reader = pd.read_excel(self.get_filename())
         self.frequencias_numeros_sorteados = self.get_frequency_in_draws()
         self.sorteios_realizados = self.create_dataframe_draws()
         self.qtde_sorteios_repetidos = self.sorteios_realizados.sorteados.duplicated().sum()
         self.lista_numeros_sorteados = self.sorteios_realizados.sorteados.values.tolist()
+
+    def get_filename(self):
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        download_folder = f'{BASE_DIR}/files'
+        if not os.listdir(download_folder):
+            results_download()
+        filename = os.listdir(download_folder)[0]
+        return f'{download_folder}/{filename}'
 
     def create_dataframe_draws(self):
         self.sorteios_realizados = self.file_reader.loc[:, "Concurso":"Data Sorteio"]
@@ -29,6 +38,4 @@ class Galofa:
 
 
 pd.set_option("display.max_colwidth", None)
-file_path = "files/Lotofácil.xlsx"
-galofa = Galofa(file_path)
-print()
+galofa = Galofa()
