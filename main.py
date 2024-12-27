@@ -1,17 +1,19 @@
 import os
 from itertools import combinations
+from random import sample
 import pandas as pd
 from results_download import results_download
 
 
 class Galofa:
     def __init__(self):
-        self.todas_combinacoes_possiveis = combinations(range(1, 26), 15)
+        self.todas_combinacoes_possiveis = list(combinations(range(1, 26), 15))
         self.file_reader = pd.read_excel(self.get_filename())
         self.frequencias_numeros_sorteados = self.get_frequency_in_draws()
         self.sorteios_realizados = self.create_dataframe_draws()
         self.qtde_sorteios_repetidos = self.sorteios_realizados.sorteados.duplicated().sum()
         self.lista_numeros_sorteados = self.sorteios_realizados.sorteados.values.tolist()
+        self.combinacoes_nao_sorteadas = set(self.todas_combinacoes_possiveis) - set(self.lista_numeros_sorteados)
 
     def get_filename(self):
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -35,6 +37,17 @@ class Galofa:
             frequencies.append(df_only_draws_numbers[f"Bola{ball_number}"].value_counts().to_dict())
         self.frequencias_numeros_sorteados = pd.DataFrame(frequencies).sum().sort_values(ascending=False)
         return self.frequencias_numeros_sorteados
+
+    def generate_bets(self, numbers:int = 15, bets_quantity: int = 1) -> list:
+        if numbers == 15:
+            return sample(list(self.combinacoes_nao_sorteadas), bets_quantity)
+        return sample(list(combinations(range(1, 26), numbers)), bets_quantity)
+
+    def check_draw_result(self, result: set, bets: list):
+        response = {}
+        for bet in bets:
+            response |= {bet: f'{len(set(bet) & set(result))} acertos'}
+        return response
 
 
 pd.set_option("display.max_colwidth", None)
