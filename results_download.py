@@ -6,7 +6,7 @@ from base_selenium import BaseSelenium
 
 def results_download():
     file_creation_date = date.today()
-    bot = BaseSelenium(with_interface=False)
+    bot = BaseSelenium(with_interface=True)
     os.chdir(bot.save_to)
     download_folder = os.listdir()
     if download_folder:
@@ -29,6 +29,3 @@ def results_download():
                 bot.driver.quit()
     else:
         print('Já foi feito o download do arquivo hoje')
-
-
-results_download()

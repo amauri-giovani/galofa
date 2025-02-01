@@ -48,11 +48,7 @@ class Galofa:
         if not result:
             print(self.sorteios_realizados.iloc[-1])
             result = self.lista_numeros_sorteados[-1]
-        response = []
-        for bet in bets:
-            response.append({str(bet): f'{len(set(bet) & set(result))} acertos'})
-        print('\nResultado: result\n')
-        print('Quantidade de acertos em cada aposta\n')
+        response = self.prepare_response(result, bets)
         return response
 
     def check_draw_result_by_contest(self, bets: list, contest_number: int = None):
@@ -62,15 +58,34 @@ class Galofa:
         else:
             contest = self.sorteios_realizados[self.sorteios_realizados['concurso'] == contest_number]
             contest_dict = contest.to_dict(orient='records')[0]
-            print(f'\n{'='*90}\nConcurso: {contest_dict["concurso"]}\nData do Sorteio: {contest_dict["data"]}\n'
-                  f'Números sorteados: {' - '.join(map(str, contest_dict["sorteados"]))}\n{'='*90}\n')
+            print(f'\n{'=' * 90}\nConcurso: {contest_dict["concurso"]}\nData do Sorteio: {contest_dict["data"]}\n'
+                  f'Números sorteados: {' - '.join(map(str, contest_dict["sorteados"]))}\n{'=' * 90}\n')
             result = contest['sorteados'].tolist()[0]
-        response = []
-        for bet in bets:
-            response.append({str(bet): f'{len(set(bet) & set(result))} acertos'})
-        print('Quantidade de acertos em cada aposta\n')
+        response = self.prepare_response(result, bets)
         return response
 
+    def prepare_response(self, result, bets):
+        correct_bets = {
+            '15': 0,
+            '14': 0,
+            '13': 0,
+            '12': 0,
+            '11': 0,
+        }
+        response = []
+        for bet in bets:
+            total_hits = len(set(bet) & set(result))
+            response.append({str(bet): f'{total_hits} acertos'})
+            if str(total_hits) in correct_bets.keys():
+                correct_bets[str(total_hits)] += 1
+        print(f'\nApostas premiadas:\n')
+        for k, v in correct_bets.items():
+            print(f'Total com {k} acertos: {v}')
+        print('\nQuantidade de acertos em cada aposta\n')
+        for item in response:
+            for k, v in item.items():
+                print(f'Aposta: {k} ==> Acertos: {v}')
+        return response
 
 pd.set_option("display.max_colwidth", None)
 galofa = Galofa()
@@ -84,7 +99,8 @@ galofa = Galofa()
 #     {1, 2, 4, 5, 6, 8, 10, 13, 17, 18, 19, 21, 23, 24, 25},
 #     {1, 4, 5, 7, 10, 13, 14, 15, 16, 18, 20, 21, 22, 23, 25},
 #     {1, 2, 3, 5, 10, 11, 14, 15, 17, 19, 20, 22, 23, 24, 25},
-#     {1, 2, 5, 6, 7, 8, 9, 15, 17, 18, 21, 22, 23, 24, 25}
+#     {1, 2, 5, 6, 7, 8, 9, 15, 17, 18, 21, 22, 23, 24, 25},
+#     {1, 2, 3, 5, 8, 9, 10, 11, 12, 16, 18, 19, 21, 22, 25}
 # ], contest_number=3307)
 # pprint(response)
 print()

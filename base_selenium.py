@@ -65,6 +65,7 @@ class BaseSelenium:
         :param element: tuple type locator containing ex: (By.ID, 'number_id')
         :return: None
         """
+        print(f'Downloading...')
         sleep(2)
         self.wdw.until(element_to_be_clickable(element)).click()
 
@@ -73,6 +74,7 @@ class BaseSelenium:
         Check status download
         :return: True if completed the download successfully or False if an error occurred
         """
+        print('checking download status')
         sleep(3)
         count = 0
         while True:
