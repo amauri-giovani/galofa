@@ -87,8 +87,16 @@ class Galofa:
                 print(f'Aposta: {k} ==> Acertos: {v}')
         return response
 
+    def check_if_you_were_drawn_by_excel(self, filename):
+        df = pd.read_excel(filename)
+        print(df)
+        lista = df.loc[:, "N1":"N15"].values.tolist()
+        print()
+
 pd.set_option("display.max_colwidth", None)
 galofa = Galofa()
+filename = ""
+galofa.check_if_you_were_drawn_by_excel(filename)
 # response = galofa.check_draw_result_by_contest([
 #     {1, 2, 4, 8, 9, 11, 12, 13, 16, 18, 20, 21, 22, 23, 25},
 #     {1, 4, 6, 8, 10, 12, 13, 15, 16, 18, 20, 21, 22, 23, 25},
